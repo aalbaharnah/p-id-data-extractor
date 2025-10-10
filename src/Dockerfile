@@ -4,7 +4,7 @@ LABEL pipelineName="pnide-webapi"
 
 USER root
 
-RUN apt-get clean && apt-get update && apt-get install -y ffmpeg libsm6 libxext6 curl gnupg
+RUN apt-get clean && apt-get update && apt-get install -y ffmpeg libsm6 libxext6 curl gnupg tesseract-ocr
 
 RUN adduser --disabled-password --gecos '' pythonwebapi
 

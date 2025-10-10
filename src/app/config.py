@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT license.
-from pydantic import BaseSettings, root_validator, validator
-
+from pydantic_settings import BaseSettings
+from pydantic import field_validator, model_validator
 from typing import Union, Optional
 
 
@@ -16,7 +16,6 @@ class Config(BaseSettings):
     enable_thinning_preprocessing_line_detection: bool = True
     flow_direction_asset_prefixes: Union[str, set[str]] = \
         {'Equipment/', 'Piping/Endpoint/Pagination'}
-    form_recognizer_endpoint: str = str()
     graph_db_authenticate_with_azure_ad: bool = False
     graph_db_connection_string: str = str()
     graph_distance_threshold_for_lines_pixels: int = 50
@@ -58,30 +57,30 @@ class Config(BaseSettings):
     valve_symbol_prefix: str = 'Instrument/Valve/'
     workers_count_for_data_batch: int = 3
 
-    class Config:
-        env_file = '.env'
-        env_file_encoding = 'utf-8'
+    model_config = {
+        "env_file": ".env",
+        "env_file_encoding": "utf-8"
+    }
 
-    @validator(
+    @field_validator(
         "blob_storage_account_url",
-        "blob_storage_container_name",
-        "form_recognizer_endpoint",
+        "blob_storage_container_name", 
         "symbol_detection_api",
         "symbol_detection_api_bearer_token",
-        "graph_db_connection_string",
-        allow_reuse=True)
+        "graph_db_connection_string")
+    @classmethod
     def validate_string(cls, v):
         if v is None or len(v) == 0:
             raise ValueError("Value must be a non-empty string")
         return v
 
-    @validator(
+    @field_validator(
             "flow_direction_asset_prefixes",
             "symbol_label_prefixes_with_text",
             "symbol_label_prefixes_to_include_in_graph_image_output",
             "symbol_label_prefixes_to_connect_if_close",
-            pre=True,
-            allow_reuse=True)
+            mode="before")
+    @classmethod
     def validate_and_transform_comma_separated_list(cls, val):
         if isinstance(val, str):
             val_arr = val.split(',')
@@ -89,21 +88,22 @@ class Config(BaseSettings):
             return set(val_arr)
         return val
 
-    @root_validator(allow_reuse=True)
-    def update_config_based_on_dotted_lines_detection(cls, values):
-        if values.get('detect_dotted_lines') is True:
-            values['line_detection_hough_min_line_length'] = None
+    @model_validator(mode="after")
+    def update_config_based_on_dotted_lines_detection(self):
+        values = self.__dict__
+        if self.detect_dotted_lines is True:
+            self.line_detection_hough_min_line_length = None
 
-            if values['line_detection_hough_max_line_gap'] is None:
-                values['line_detection_hough_max_line_gap'] = 10
-        elif values.get('detect_dotted_lines') is False:
-            if values['line_detection_hough_min_line_length'] is None or \
-                    values['line_detection_hough_min_line_length'] < 10:
-                values['line_detection_hough_min_line_length'] = 10
+            if self.line_detection_hough_max_line_gap is None:
+                self.line_detection_hough_max_line_gap = 10
+        elif self.detect_dotted_lines is False:
+            if self.line_detection_hough_min_line_length is None or \
+                    self.line_detection_hough_min_line_length < 10:
+                self.line_detection_hough_min_line_length = 10
 
-            values['line_detection_hough_max_line_gap'] = None
+            self.line_detection_hough_max_line_gap = None
 
-        return values
+        return self
 
 
 config = Config()

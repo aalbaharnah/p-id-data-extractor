@@ -148,10 +148,6 @@ The following configuration parameters may be defined...
 
 - **FLOW_DIRECTION_ASSET_PREFIXES** [DEFAULT=Equipment/,Piping/Endpoint/Pagination]: The prefixes of the assets should always connect to the process flow line to assign flow direction.
 
-- **FORM_RECOGNIZER_API_KEY** [REQUIRED]: The form recognizer API key.
-
-- **FORM_RECOGNIZER_ENDPOINT** [REQUIRED]: The form recognizer endpoint.
-
 - **GRAPH_DB_AUTHENTICATE_WITH_AZURE_AD** [DEFAULT=False]: This parameter specifies whether Azure Active Directory authentication has to be used when connecting to the Graph SQL database.
 
 - **GRAPH_DB_CONNECTION_STRING** [REQUIRED]: This parameter specifies the Graph SQL database connection string.

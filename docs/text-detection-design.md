@@ -19,21 +19,34 @@ OCR is performed by making a single API call to the [Document Analysis API](http
 The API returns a [JSON body](https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/concept-layout?view=doc-intel-3.0.0#pages-extraction) containing the [content, layout, style, and semantic elements](https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/concept-analyze-document-response?view=doc-intel-3.0.0#analyze-response) of the image analyzed. Based on the project requirements, the relevant results include each piece of text recognized, the bounding box coordinates of that text in the image, and the confidence score of the OCR results;
 these can be further analyzed to associate text with symbols, as we'll discuss in the [proposed flow](#proposed-text-detection-workflow).
 
-Additionally, due to the nature of the P&ID documents, [high-resolution extraction capability](https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/concept-add-on-capabilities?view=doc-intel-3.0.0#high-resolution-extraction) will be enabled to recognize small text from large-size documents.
-
-For more information on the definition of the Read OCR model, see the documentation linked [here](https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/concept-read?view=doc-intel-3.0.0).
+For more information on Tesseract OCR, see the documentation linked [here](https://tesseract-ocr.github.io/).
 
 ## Relevant infrastructure
 
-We will need to deploy an [Azure Form Recognizer](https://portal.azure.com/#create/Microsoft.CognitiveServicesFormRecognizer) resource.
+This solution uses Tesseract OCR, an open-source optical character recognition engine. Tesseract is included as a Python dependency via the `pytesseract` package and does not require any external cloud services.
 
-This can be deployed into a specified virtual network and subnet for purposes of network security.
-More information on configuring Azure Form Recognizer for use with virtual networks can be found in the [Azure docs](https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/managed-identities-secured-access?view=doc-intel-3.0.0#configure-private-endpoints-for-access-from-vnets).
+### Tesseract Installation Requirements
 
-To access the Form Recognizer resource, the application's service principal will be assigned to the
-[`Cognitive Services User` role](https://learn.microsoft.com/en-us/python/api/overview/azure/ai-formrecognizer-readme?view=azure-python#create-the-client-with-an-azure-active-directory-credential). Thus,
-API calls that authenticate with `DefaultAzureCredential` do not require the API access key of the created Form Recognizer resource; they only requires
-the endpoint.
+Tesseract OCR engine must be installed on the system where this application runs:
+
+**Ubuntu/Debian:**
+```bash
+sudo apt-get install tesseract-ocr
+```
+
+**macOS:**
+```bash
+brew install tesseract
+```
+
+**Windows:**
+Download and install from: https://github.com/UB-Mannheim/tesseract/wiki
+
+**Docker:**
+The Dockerfile should include Tesseract installation. For Ubuntu-based images:
+```dockerfile
+RUN apt-get update && apt-get install -y tesseract-ocr
+```
 
 ## Image pre-processing strategies + experiment results
 
