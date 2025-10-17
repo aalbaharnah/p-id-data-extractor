@@ -51,6 +51,9 @@ class CloudStorageClient:
         return blob
 
     def download_bytes(self, blob_name: str) -> bytes:
+        '''Downloads the given blob from the blob storage account.
+
+    def download_bytes(self, blob_name: str) -> bytes:
         '''Downloads the given blob from the Google Cloud Storage bucket.
 
         :param blob_name: The name of the blob to download

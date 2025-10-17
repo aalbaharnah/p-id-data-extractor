@@ -4,7 +4,7 @@ from fastapi import FastAPI, HTTPException, Request, Response, UploadFile
 from starlette.types import Message
 from starlette.middleware.base import BaseHTTPMiddleware
 import logger_config
-from app.services.blob_storage_client import BlobStorageClient
+from app.services.blob_storage_client import CloudStorageClient
 from app.models.enums.inference_result import InferenceResult
 from app.services import storage_path_template_builder
 
@@ -15,7 +15,7 @@ class TracingMiddleware(BaseHTTPMiddleware):
     '''
     This class is used to log the requests and responses of the API.
     '''
-    def __init__(self, app: FastAPI, blob_storage_client: BlobStorageClient):
+    def __init__(self, app: FastAPI, blob_storage_client: CloudStorageClient):
         super().__init__(app)
         self.enable_storing_data = True
         self.blob_storage_client = blob_storage_client

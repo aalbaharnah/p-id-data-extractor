@@ -7,8 +7,8 @@ from typing import Union, Optional
 
 class Config(BaseSettings):
     arrow_symbol_label: str = 'Piping/Fittings/Mid arrow flow direction'
-    blob_storage_account_url: str = str()
-    blob_storage_container_name: str = str()
+    gcs_bucket_name: str = str()
+    gcp_project_id: str = str()
     centroid_distance_threshold: float = 0.5
     debug: bool = False
     detect_dotted_lines: bool = False
@@ -16,8 +16,7 @@ class Config(BaseSettings):
     enable_thinning_preprocessing_line_detection: bool = True
     flow_direction_asset_prefixes: Union[str, set[str]] = \
         {'Equipment/', 'Piping/Endpoint/Pagination'}
-    graph_db_authenticate_with_azure_ad: bool = False
-    graph_db_connection_string: str = str()
+    firestore_database_id: str = "(default)"
     graph_distance_threshold_for_lines_pixels: int = 50
     graph_distance_threshold_for_symbols_pixels: int = 5
     graph_distance_threshold_for_text_pixels: int = 5
@@ -63,11 +62,10 @@ class Config(BaseSettings):
     }
 
     @field_validator(
-        "blob_storage_account_url",
-        "blob_storage_container_name", 
+        "gcs_bucket_name",
+        "gcp_project_id", 
         "symbol_detection_api",
-        "symbol_detection_api_bearer_token",
-        "graph_db_connection_string")
+        "symbol_detection_api_bearer_token")
     @classmethod
     def validate_string(cls, v):
         if v is None or len(v) == 0:
